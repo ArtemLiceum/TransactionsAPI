@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <script>
+        let refreshInterval = {{ refresh_interval }} * 1000;
+
+        // Функция для обновления страницы
+        function autoRefresh() {
+            if (refreshInterval > 0) {
+                setTimeout(() => {
+                    location.reload();
+                }, refreshInterval);
+            }
+        }
+
+        // Устанавливаем начальный интервал обновления
+        autoRefresh();
+
+        // Функция для обновления интервала через AJAX
+        function updateRefreshInterval(interval) {
+            fetch('/set_refresh_interval', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({refresh_interval: interval})
+            }).then(response => response.json())
+            .then(data => {
+                if (data.refresh_interval !== undefined) {
+                    refreshInterval = data.refresh_interval * 1000;
+                    autoRefresh();
+                }
+            }).catch(error => console.error('Error updating interval:', error));
+        }
+    </script>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <p>Total Users: {{ total_users }}</p>
+    <p>Total Transactions: {{ total_transactions }}</p>
+    <p>Total Transaction Amount: {{ total_transaction_amount }}</p>
+
+    <!-- Список транзакций -->
+    <h2>Recent Transactions</h2>
+    <ul>
+        {% for transaction in recent_transactions %}
+        <li>{{ transaction.id }} - {{ transaction.amount }}</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Управление интервалом автообновления -->
+    <h2>Refresh Interval</h2>
+    <select onchange="updateRefreshInterval(this.value)">
+        <option value="0" {% if refresh_interval == 0 %}selected{% endif %}>No Auto-Refresh</option>
+        <option value="10" {% if refresh_interval == 10 %}selected{% endif %}>10 Seconds</option>
+        <option value="15" {% if refresh_interval == 15 %}selected{% endif %}>15 Seconds</option>
+        <option value="30" {% if refresh_interval == 30 %}selected{% endif %}>30 Seconds</option>
+        <option value="60" {% if refresh_interval == 60 %}selected{% endif %}>1 Minute</option>
+    </select>
+</body>
+</html>
