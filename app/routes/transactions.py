@@ -32,8 +32,18 @@ bp = Blueprint('transactions', __name__)
         }
     }
 })
-def transactions():
-    transactions = Transaction.query.all()
+def transactions_list():
+    user_id = request.args.get('user_id')
+    status = request.args.get('status')
+
+    query = db.session.query(Transaction)
+
+    if user_id:
+        query = query.filter(Transaction.user_id == user_id)
+    if status:
+        query = query.filter(Transaction.status == status.upper())
+
+    transactions = query.all()
     return render_template('transactions.html', transactions=transactions)
 
 @bp.route('/transactions/<int:transaction_id>', methods=['GET', 'POST'])

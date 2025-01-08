@@ -7,14 +7,41 @@
 </head>
 <body>
     <h1>Transactions</h1>
-    <ul>
-        {% for transaction in transactions %}
-            <li>
-                <a href="{{ url_for('transactions.transaction_detail', transaction_id=transaction.id) }}">
-                    {{ transaction.id }} - {{ transaction.amount }} - {{ transaction.status.value }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+
+    <form method="get" action="/transactions">
+        <label for="user_id">User ID:</label>
+        <input type="text" name="user_id" id="user_id">
+
+        <label for="status">Status:</label>
+        <select name="status" id="status">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="canceled">Canceled</option>
+            <option value="expired">Expired</option>
+        </select>
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.id }}</td>
+                <td>{{ transaction.user_id }}</td>
+                <td>{{ transaction.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 </body>
 </html>

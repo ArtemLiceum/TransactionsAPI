@@ -1,6 +1,5 @@
 from datetime import datetime
 from enum import Enum
-from flask_sqlalchemy import SQLAlchemy
 from app import db
 
 
@@ -10,6 +9,9 @@ class TransactionStatus(Enum):
     CANCELED = "canceled"
     EXPIRED = "expired"
 
+class UserRole(Enum):
+    ADMIN = "admin"
+    USER = "user"
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -18,11 +20,15 @@ class User(db.Model):
     balance = db.Column(db.Float, nullable=False, default=0.0)
     commission_rate = db.Column(db.Float, nullable=False, default=0.0)
     webhook_url = db.Column(db.String(255), nullable=True)
+    role = db.Column(db.Enum(UserRole), nullable=False, default=UserRole.USER)
 
     transactions = db.relationship('Transaction', back_populates='user', cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id={self.id}, balance={self.balance}, commission_rate={self.commission_rate})>"
+
+    def is_admin(self):
+        return self.role == UserRole.ADMIN
 
 
 class Transaction(db.Model):

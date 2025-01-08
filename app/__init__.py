@@ -6,7 +6,7 @@ import os
 
 db = SQLAlchemy()
 migrate = Migrate()
-
+celery = None
 
 def create_app():
     app = Flask(__name__)
@@ -18,8 +18,11 @@ def create_app():
     }
     app.config['SESSION_TYPE'] = 'filesystem'
 
+    global celery
+
     db.init_app(app)
     migrate.init_app(app, db)
+
     Swagger(app)
 
     from .routes import dashboard, users, transactions
